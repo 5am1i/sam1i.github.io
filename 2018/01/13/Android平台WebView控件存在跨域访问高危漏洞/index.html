@@ -22,7 +22,11 @@
 <p>漏洞触发成功前提条件如下：</p>
 <ol>
 <li>WebView中setAllowFileAccessFromFileURLs 或setAllowUniversalAccessFromFileURLsAPI配置为true；（Android4.1版本之前这两个API默认是true，需要显式设置为false）</li>
-<li>WebView可以直接被外部调用，并能够加载外部可控的HTML文件。<h2 id="0x03影响范围"><a href="#0x03影响范围" class="headerlink" title="0x03影响范围:"></a>0x03影响范围:</h2>漏洞影响使用WebView控件，开启file域访问并且未按安全策略开发的Android应用APP。<br>CNVD对相关漏洞综合评级为“高危”。<h2 id="0x04修复建议"><a href="#0x04修复建议" class="headerlink" title="0x04修复建议:"></a>0x04修复建议:</h2>厂商暂未发布解决方案，临时解决方案如下：</li>
+<li>WebView可以直接被外部调用，并能够加载外部可控的HTML文件。</li>
+</ol>
+<h1 id="0x03影响范围"><a href="#0x03影响范围" class="headerlink" title="0x03影响范围:"></a>0x03影响范围:</h1><p>漏洞影响使用WebView控件，开启file域访问并且未按安全策略开发的Android应用APP。<br>CNVD对相关漏洞综合评级为“高危”。</p>
+<h1 id="0x04修复建议"><a href="#0x04修复建议" class="headerlink" title="0x04修复建议:"></a>0x04修复建议:</h1><p>厂商暂未发布解决方案，临时解决方案如下：</p>
+<ol>
 <li>检查应用是否使用了webview控件；</li>
 <li>避免App内部的WebView被不信任的第三方调用。排查内置WebView的Activity是否被导出、必须导出的Activity是否会通过参数传递调起内置的WebView等。</li>
 <li>file域访问为非功能需求时，手动配置setAllowFileAccessFromFileURLs或setAllowUniversalAccessFromFileURLs两个API为false。（Android4.1版本之前这两个API默认是true，需要显式设置为false）</li>
