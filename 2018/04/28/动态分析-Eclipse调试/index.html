@@ -1,0 +1,72 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="我来看看效果"><title>动态分析-Eclipse调试 | Samli</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/7.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">动态分析-Eclipse调试</h1><a id="logo" href="/.">Samli</a><p class="description">个人博客分享</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">动态分析-Eclipse调试</h1><div class="post-meta">Apr 28, 2018<script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><div class="post-content"><h2 id="0x00-开篇"><a href="#0x00-开篇" class="headerlink" title="0x00 开篇"></a>0x00 开篇</h2><p>之前说过，用Android Studio和Eclipse对应用进行动态调试的机会会很少，但是最近接触一个项目就需要用到动态调试的技术，而之前已经讲过Android Studio对smali的动态调试了，这里讲下Eclipse对java的动态调试。</p>
+<h2 id="0x01-动态调试有哪些手段"><a href="#0x01-动态调试有哪些手段" class="headerlink" title="0x01 动态调试有哪些手段"></a>0x01 动态调试有哪些手段</h2><ol>
+<li><strong>Idea对smali代码进行动态调试，</strong>Android Studio是基于Idea修改而来，所以调试方法一样，Android Studio调试smali的话需要安装调试插件SmaliIdea。</li>
+<li><strong>Eclipse对java代码进行动态调试，</strong>Eclipse是不识别smali代码，所以需要将smali代码转换成java代码才可以进行调试，之前学习的时候说Eclipse不方便，但是又听说对于这个项目会方便很多，看来世事无绝对。</li>
+<li><strong>IDA对dex、so的动态调试，</strong>dex是可以通过静态附加进行来进行动态调试的，但IDA对变量类型支持不太友好，所以能用Idea还是用idea吧，IDA主要用于so调试，脱壳，dump数据等等。</li>
+<li><strong>JEB动态调试，</strong>自jeb2.2以上，已经支持动态调试，并且是无缝调试，可以从java层跟踪到native层，并可以正常返回到java层，非常强大，最新版同时支持了arm64调试，只是买不起。</li>
+<li><strong>GDB动态调试，</strong>个人对GDB的使用仅限于附加，dump，而GDB的功能远不止于此，下断，跳转等等都能做，没用过，略过。就·</li>
+</ol>
+<h2 id="0x02-项目情况"><a href="#0x02-项目情况" class="headerlink" title="0x02 项目情况"></a>0x02 项目情况</h2><p>项目的需求是这样的，整个APP都对数据包进行了加密，直接抓包的话是只能看见加密后的报文，而我们需要对APP进行渗透测试，所以需要将断点下在加密函数执行前，这样就可以看到没加密的报文，然后对报文数据进行修改测试；</p>
+<p>加密后的数据包，如下；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\1.png" alt="img"></p>
+<h2 id="0x03-调试前准备"><a href="#0x03-调试前准备" class="headerlink" title="0x03 调试前准备"></a>0x03 调试前准备</h2><p>加debuggable=”true”；加waitForDebuggable()函数这些操作就不说了，做任何调试都需要的；</p>
+<p>虽然说是Eclipse调试java代码，但是我们知道，apktool反编译出来的是smali代码，而不是java源码，那我们需要怎么做才能得到java代码呢？</p>
+<p>apktool的d操作有个-d参数，是debug，也就是说反编译出来的代码是做调试用的，什么意思呢，意思是反编译出来的是smali后缀的文件，而Eclipse只识别java文件，所以一定要加上这个参数。具体是命令是<strong>：java -jar apktool.jar d -d apk.apk ;（这里生成一个文件夹）</strong></p>
+<p>正常反编译出来的文件；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/e8231a15d53e4b61bbbbae716399c1d4/clipboard.png" alt="img"></p>
+<p>文件内容：</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/67bbc11b7aa54ae9aebf318c8eaeb422/clipboard.png" alt="img"></p>
+<p>加-d后的反编译过程；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/2eb9e66f15f84ac18b8c1c2461a0e4ad/clipboard.png" alt="img"></p>
+<p>加-d后反编译出来的文件；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/88559e781ad94be2a552991e7d9a7399/clipboard.png" alt="img"></p>
+<p>文件内容；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/3bc185e6ac6b43baa999f606b01f6c31/clipboard.png" alt="img"></p>
+<p>这里可以看到虽然后缀是java文件，但是里面内容还是跟smali一样的。</p>
+<p>记得，改完包重新打包（编译的时候）记得也要加上-d参数，不然怎么死的都不知道；</p>
+<p>java -jar apktool.jar b -d /apk ;（这里生成一个apk文件）</p>
+<p>再签名；</p>
+<h2 id="0x04-开始调试"><a href="#0x04-开始调试" class="headerlink" title="0x04 开始调试"></a>0x04 开始调试</h2><h3 id="1-导入工程（也就是导入生成的文件夹）"><a href="#1-导入工程（也就是导入生成的文件夹）" class="headerlink" title="1.导入工程（也就是导入生成的文件夹）"></a>1.导入工程（也就是导入生成的文件夹）</h3><p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/c52ce0fd93844b3cb1f904b938185b4e/clipboard.png" alt="img"></p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/8f2b0176a1b849ceb7937e47501f9138/clipboard.png" alt="img"></p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/f3d102e87afc4d8489396380eab10190/clipboard.png" alt="img"></p>
+<h3 id="2-设置断点"><a href="#2-设置断点" class="headerlink" title="2.设置断点"></a>2.设置断点</h3><p>这里就不多讲，先假设我们已经找到加密函数的位置；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/b0f3ef18d33d44f59711b9f26f07b085/clipboard.png" alt="img"></p>
+<h3 id="3-连接设备"><a href="#3-连接设备" class="headerlink" title="3.连接设备"></a>3.连接设备</h3><p>记得将设备设置成调试模式；至于怎么找到调试模式的按钮，就自己上网查了。</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/8aff4056d187498bbfc605a92450334d/clipboard.png" alt="img"></p>
+<p>连接上设备，安装应用；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/aa561d5fe38e4100a37dd930148a99ec/clipboard.png" alt="img"></p>
+<h3 id="4-启动应用"><a href="#4-启动应用" class="headerlink" title="4.启动应用"></a>4.启动应用</h3><p>启动应用，因为在入口处设置了waitForDebuggable()函数，所以应用在启动的时候会进入调试模式，此时会弹出一个应用正在被调试的窗口，我这里没有弹出来，但是我们可以到DDMS里看；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/1704db91a3a0462f9ca1ed589a2ddfbc/clipboard.png" alt="img"></p>
+<p>这里可以看到应用有个红色的小虫子的标志，这里代表此应用可以被调试；</p>
+<h3 id="5-调试应用"><a href="#5-调试应用" class="headerlink" title="5.调试应用"></a>5.调试应用</h3><p>回到eclipse，找到小虫子的按钮，进入Debug Configuration；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/df7ac7c426cb460daa888b3859630026/clipboard.png" alt="img"></p>
+<p>双击进入Remote Java APPlication，project，记得要设置为当前对应调试的项目；</p>
+<p>connection有Listner和Attach方式；</p>
+<ul>
+<li>Listner方式：是调试客户端启动就准备好一个端口，当调试服务端准备好了，就连接这个端口进行调试</li>
+<li>Attach方式：是调试服务端开始就启动一个端口，等待调试端来连接这个端口</li>
+</ul>
+<p>我们这种调试方式选择Attack；</p>
+<p>设置Host和port；</p>
+<p>Host一般为localhost，本地调试；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/77e5757e41ed45a6944139aa665d48d1/clipboard.png" alt="img"></p>
+<p>至于port怎么看，这里涉及到JDWP线程；我总结下，用通俗的话解释，可以看到，上面的图中有个8631的数字，那个便是应用所使用的端口，点一下，可以看到8631/8700，所以也可以设置为8700为调试端口，如果系统同时存在有两个或两个以上的程序可以调试，设置为8700的话，就不知道调的是哪个了，所以一般建议将调试端口和调试项目对应起来；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/81c2191a27ed4df4b7b0f85a2ab97dae/clipboard.png" alt="img"></p>
+<p>调试成功后，小虫子会变绿，不要问我为什么变绿；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/f97de3e5d6de4a4da94311f9ac4ddfd7/clipboard.png" alt="img"></p>
+<p>此时应用也进入主界面，但是由于我调试的这个应用已经不能访问了，所以出现下面这种情况；</p>
+<p><img src="E:\gitblog\hexo\public\2018\04\28\img1\/71fcbe5b476141da99a688e47daa2409/clipboard.png" alt="img"></p>
+<h2 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h2><p>文章到这里，留下两个问题：</p>
+<ol>
+<li>怎么找的加密函数（关键函数，需要下断点的函数）的位置；</li>
+<li>怎么抓取未加密的数据包，并修改数据包内容；</li>
+</ol>
+<p>第一个问题以后再说；关于第二个问题是因为这次的app不能使用了，我简单说一下情况，因为断点下在了加密函数运行之前，所以我们能在拦截的参数中看到没有加密的数据，eclipse支持修改数据，这时我们修改数据，运行即可，查看返回的数据包是同样的，在返回的数据包，也就是return中下一个断点，就能看到从服务端返回来的没有加密的数据。</p>
+<p><strong>注意点</strong>：</p>
+<ul>
+<li>反编译和编译的-d参数，不然断点会失效；</li>
+<li>设备开启调试模式；</li>
+<li>项目名称要对应调试的应用；</li>
+<li>端口要对应调试的应用；</li>
+</ul>
+</div><iframe src="/donate/?AliPayQR=undefined&amp;WeChatQR=/img/WeChatQR.png&amp;GitHub=null&amp;BTCQR=null&amp;BTCKEY=null&amp;PayPal=null" style="overflow-x:hidden; overflow-y:hidden; border:0xp none #fff; min-height:240px; width:100%;" frameborder="0" scrolling="no"></iframe><div class="tags"><a href="/tags/Android/">Android</a></div><div class="post-nav"><a class="pre" href="/2018/06/01/常用端口速查/">常用端口速查</a><a class="next" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></div></div></div></div><div class="pure-u-1 pure-u-md-1-4"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://5am1i.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/SRC/" style="font-size: 15px;">SRC</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/Web/" style="font-size: 15px;">Web</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/12/常见问题修复建议/">常见问题修复建议</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/信息搜集之搜索引擎/">信息搜集之搜索引擎</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/常用端口速查/">常用端口速查</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-Eclipse调试/">动态分析-Eclipse调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/AndroidManifest-xml的安全问题/">AndroidManifest.xml的安全问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/阿里Android开发手册-安全/">阿里Android开发手册-安全</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/SRC怎么玩/">SRC怎么玩</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/19/Android去广告/">Android去广告</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/13/Android平台WebView控件存在跨域访问高危漏洞/">Android平台WebView控件存在跨域访问高危漏洞</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://init1.in/" title="这个友联需要用谷歌浏览器打开" target="_blank">这个友联需要用谷歌浏览器打开</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Samli.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="我来看看效果"><title>Android去广告 | Samli</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/7.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/1.0.0/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Android去广告</h1><a id="logo" href="/.">Samli</a><p class="description">个人博客分享</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Android去广告</h1><div class="post-meta">Apr 19, 2018<script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> 阅读</span></span></div><div class="post-content"><h2 id="Android去广告"><a href="#Android去广告" class="headerlink" title="Android去广告"></a>Android去广告</h2><h3 id="0x00-软件中的广告"><a href="#0x00-软件中的广告" class="headerlink" title="0x00 软件中的广告"></a>0x00 软件中的广告</h3><h4 id="什么是广告？"><a href="#什么是广告？" class="headerlink" title="什么是广告？"></a>什么是广告？</h4><p>任何与软件本身无关的内容都属于广告；</p>
+<p>广告的表现形式很多，有的时候是一个界面（activity），有的时候是局部在上方或下方的一个区域视图（view），有的时候可能是工具条（toolbar），也可能是一个对话框（dialog）里出现广告内容。<br>但是看到的并不一定是表现出来的；有时候看到的区域视图、对话框、工具条都有可能是一个activity。</p>
+<h4 id="广告来源"><a href="#广告来源" class="headerlink" title="广告来源"></a>广告来源</h4><ul>
+<li>push推送</li>
+<li>第三方SDK</li>
+</ul>
+<p>广告常见的就是push推送广告，这也就要求了在配置清单xml 中，需要声明必要的service 和receiver，同时还应要求有pushid。推送广告内容基本都是来源于广告服务商的服务器。另一方面，注入的第三方SDK，只需要添加个人注册的id，便可以实现盈利，同样广告内容来源于广告服务商。</p>
+<h4 id="广告商与盈利模式"><a href="#广告商与盈利模式" class="headerlink" title="广告商与盈利模式"></a>广告商与盈利模式</h4><p><strong>针对Android平台</strong><br>国内常见广告商：友盟、腾讯、有米、百度等<br>国外常见广告商：Facebook、Admob等</p>
+<p><strong>盈利模式</strong><br>商家投放广告-&gt;广告商平台-&gt;开发者编写应用嵌入广告商提供的SDK-&gt;用户点击、用户消费-&gt;商家获益-&gt;广告商平台获益-&gt;开发者获益</p>
+<h3 id="0x01-去除广告思路"><a href="#0x01-去除广告思路" class="headerlink" title="0x01 去除广告思路"></a>0x01 去除广告思路</h3><h4 id="广告去除的基本原理与思想"><a href="#广告去除的基本原理与思想" class="headerlink" title="广告去除的基本原理与思想"></a><strong>广告去除的基本原理与思想</strong></h4><p>上述已经说明，无论怎样形式、怎样来源的广告，在本地一定需要一个容器去当作广告内容的载体，如果可以把容器去除掉，那么就完成了去广告。<br>广告的容器就是一些界面、视图等，以往课程已经说过，对于页面，即可以利用静态的布局，也可以在代码中动态生成。</p>
+<p>根据上述理论知识，思路就可以分为以下两个方向：</p>
+<ol>
+<li>对于简单的静态布局编写的广告界面，我们可以直接从配置清单xml文件，或相应的布局xml文件入手；</li>
+<li>对于复杂的，也就是已经形成了第三方SDK的，可能配置清单xml文件难以处理，或即使处理了相关的xml文件依然存在广告，或采用动态编写和检测，广告页面循环出现等等问题，我们采用从代码逻辑上入手。</li>
+</ol>
+<p>根据思路进行的操作大概如下:</p>
+<ol>
+<li>通过删除配置清单Androidmainfest. xml文件关于广告界面的相关声明，来去除广告页面。</li>
+<li>广告在代码中往往出现较早，一般会在入口点的oncreate()方法处注入，我们分析代码逻辑，让广告页面不出现，或删除动态生成广告页面的代码。另外，任何拥有广告的软件，一定会有自己的广告消失方法，找到后进行自行调用。同理，如果采用了动态代码生成广告页面，在拥有创建相应页面视图的方法同时，一定会有关闭、隐藏广告页面的方法，找到方法，然后在创建时就调用，这就可以做到，刚刚创建就进行关闭和隐藏</li>
+<li>由于广告以push广告为主，如果删除对应的pushid，那么特别对于第三方广告商的广告，是无法识别该广告的推广者或推广内容是什么，那么就不会给广告拓展：因为推送广告内容基本都是从网络获取的，如果截断了这条路，如把获取广告的IP地址改为127.0.0.1，那么本地没有广告内容，也就不会有广告。</li>
+</ol>
+<h3 id="0x02-实际案例"><a href="#0x02-实际案例" class="headerlink" title="0x02 实际案例"></a>0x02 实际案例</h3><p><strong>准备：</strong></p>
+<ul>
+<li>二维码扫描apk</li>
+<li>Android kill</li>
+<li>JEB</li>
+<li>手机或者模拟器</li>
+</ul>
+<p><strong>去广告目标：一个自己常用的工具：“二维码扫描”；</strong></p>
+<p>打开界面如下：<br><img src="E:\gitblog\hexo\public\2018\04\19\img\1.png" alt=""></p>
+<p>每次打开都有广告，很烦；<br>用Burpsuite抓包查看广告来源（这时候会遇到各种抓不到的情况，应对的方法也很多，我这个目标是个简单的应用，直接用Burpsuite就抓到了）</p>
+<p>打开应用抓到五个数据包，查看这几个数据包发现广告来自第二个；<br><img src="E:\gitblog\hexo\public\2018\04\19\img\2.png" alt=""><br>重放第二个数据包，<br><img src="E:\gitblog\hexo\public\2018\04\19\img\3.png" alt=""></p>
+<p>分析数据包，查看链接，确定为广告的来源；<br><a href="http://pgdt.gtimg.cn/gdt/0/DAAUZSFAKAAPAABgBa10d4DzY5_9VS.jpg/0?ck=896de5f38d9a9f831bee6a75c669297e" target="_blank" rel="noopener">http://pgdt.gtimg.cn/gdt/0/DAAUZSFAKAAPAABgBa10d4DzY5_9VS.jpg/0?ck=896de5f38d9a9f831bee6a75c669297e</a><br><img src="E:\gitblog\hexo\public\2018\04\19\img\4.png" alt=""></p>
+<p>在Android kill中搜索<em>mi.gdt.qq.com、gdt_mview.fcg</em>；即使分开单个关键词搜索也一无所获；但是可以看到返回来的数据为json格式，并不是h5的广告也不直接是图片，应用还需要对json数据进行处理，这里转换思路寻找处理的函数，将处理的结果修改为return空值，这样就不会返回广告了。</p>
+<p>继续在Android kill中搜索关键字<em>getAd，Ad</em>，结果如下，看了下<em>getAd</em>的结果，也没有什么发现；<em>Ad</em>的结果太多，懒得看；这时候还有什么办法呢？<br><img src="E:\gitblog\hexo\public\2018\04\19\img\5.png" alt=""><br><img src="E:\gitblog\hexo\public\2018\04\19\img\8.png" alt=""></p>
+<hr>
+<p><strong>提供几个思路：</strong></p>
+<ol>
+<li>分析数据包的相关参数；</li>
+<li>查看logcat日志；</li>
+<li>继续硬着头皮分析代码的执行流程；（静态分析、动态调试）</li>
+</ol>
+<hr>
+<p>回到数据包那里，继续看其他参数，发现一个<em>posid</em>，猜测此id的作用是通过此id访问广告，从而统计并结算收益，搜索<em>8060013973605191</em>，结果如下：<br><img src="E:\gitblog\hexo\public\2018\04\19\img\6.png" alt=""><br><img src="E:\gitblog\hexo\public\2018\04\19\img\7.png" alt=""></p>
+<p>分析代码，这里可以借助JEB来分析，可以查看谁调用了<em>a()</em>，同样的，如果查看logcat日志，当广告出现，点击广告或者跳过广告等操作是也是可以定位到这里。<br><img src="E:\gitblog\hexo\public\2018\04\19\img\13.png" alt=""></p>
+<p>此时，尝试删掉<em>posid</em>的值，再访问看会出现什么结果，<br><img src="E:\gitblog\hexo\public\2018\04\19\img\9.png" alt=""></p>
+<p>这样返回来的数据就没有可以访问的广告链接，这样就没有广告了；<br>说干就干，修改、保存、编译、签名、安装、打开，<br><img src="E:\gitblog\hexo\public\2018\04\19\img\10.png" alt=""><br>真的没有广告了，但是还有一个升级提示，也很烦；</p>
+<p>其实这个升级的查询就在应用打开时的第五个数据包中，<br><img src="E:\gitblog\hexo\public\2018\04\19\img\14.png" alt=""></p>
+<p>同样搜索关键字<em>AppUpgrade</em>；<br><img src="E:\gitblog\hexo\public\2018\04\19\img\11.png" alt=""></p>
+<p>相同操作，打包完后就ok了。<br>再次打开广告没了,升级提示也没有了,舒服.</p>
+<p><strong>结：</strong><br>简单介绍了下Android去广告的思路和一个简单案例,<br>引申下几点:</p>
+<ol>
+<li>灰产会怎么利用?(批量修改,将广告改为自己的,从中获利)</li>
+<li>如果应用对完整性做了验证,重打包后自动退出或者不能正常使用,还有什么方式去广告?(利用Xposed,HOOK对应需要修改的值,前提是需要ROOT权限和会Xposed插件开发)</li>
+</ol>
+</div><iframe src="/donate/?AliPayQR=undefined&amp;WeChatQR=/img/WeChatQR.png&amp;GitHub=null&amp;BTCQR=null&amp;BTCKEY=null&amp;PayPal=null" style="overflow-x:hidden; overflow-y:hidden; border:0xp none #fff; min-height:240px; width:100%;" frameborder="0" scrolling="no"></iframe><div class="tags"><a href="/tags/Android/">Android</a></div><div class="post-nav"><a class="pre" href="/2018/04/20/SRC怎么玩/">SRC怎么玩</a><a class="next" href="/2018/01/13/Android平台WebView控件存在跨域访问高危漏洞/">Android平台WebView控件存在跨域访问高危漏洞</a></div></div></div></div><div class="pure-u-1 pure-u-md-1-4"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://5am1i.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/SRC/" style="font-size: 15px;">SRC</a> <a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/Web/" style="font-size: 15px;">Web</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/12/常见问题修复建议/">常见问题修复建议</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/信息搜集之搜索引擎/">信息搜集之搜索引擎</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/常用端口速查/">常用端口速查</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-Eclipse调试/">动态分析-Eclipse调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/AndroidManifest-xml的安全问题/">AndroidManifest.xml的安全问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/阿里Android开发手册-安全/">阿里Android开发手册-安全</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/SRC怎么玩/">SRC怎么玩</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/19/Android去广告/">Android去广告</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/13/Android平台WebView控件存在跨域访问高危漏洞/">Android平台WebView控件存在跨域访问高危漏洞</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://init1.in/" title="这个友联需要用谷歌浏览器打开" target="_blank">这个友联需要用谷歌浏览器打开</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Samli.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
