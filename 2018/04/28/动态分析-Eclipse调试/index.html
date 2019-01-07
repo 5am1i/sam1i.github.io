@@ -8,38 +8,38 @@
 </ol>
 <h2 id="0x02-项目情况"><a href="#0x02-项目情况" class="headerlink" title="0x02 项目情况"></a>0x02 项目情况</h2><p>项目的需求是这样的，整个APP都对数据包进行了加密，直接抓包的话是只能看见加密后的报文，而我们需要对APP进行渗透测试，所以需要将断点下在加密函数执行前，这样就可以看到没加密的报文，然后对报文数据进行修改测试；</p>
 <p>加密后的数据包，如下；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1\1.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/1.png" alt="img"></p>
 <h2 id="0x03-调试前准备"><a href="#0x03-调试前准备" class="headerlink" title="0x03 调试前准备"></a>0x03 调试前准备</h2><p>加debuggable=”true”；加waitForDebuggable()函数这些操作就不说了，做任何调试都需要的；</p>
 <p>虽然说是Eclipse调试java代码，但是我们知道，apktool反编译出来的是smali代码，而不是java源码，那我们需要怎么做才能得到java代码呢？</p>
 <p>apktool的d操作有个-d参数，是debug，也就是说反编译出来的代码是做调试用的，什么意思呢，意思是反编译出来的是smali后缀的文件，而Eclipse只识别java文件，所以一定要加上这个参数。具体是命令是<strong>：java -jar apktool.jar d -d apk.apk ;（这里生成一个文件夹）</strong></p>
 <p>正常反编译出来的文件；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/2.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/2.png" alt="img"></p>
 <p>文件内容：</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/3.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/3.png" alt="img"></p>
 <p>加-d后的反编译过程；</p>
 <p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1\4.png" alt="img"></p>
 <p>加-d后反编译出来的文件；</p>
 <p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1\5.png" alt="img"></p>
 <p>文件内容；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/6.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/6.png" alt="img"></p>
 <p>这里可以看到虽然后缀是java文件，但是里面内容还是跟smali一样的。</p>
 <p>记得，改完包重新打包（编译的时候）记得也要加上-d参数，不然怎么死的都不知道；</p>
 <p>java -jar apktool.jar b -d /apk ;（这里生成一个apk文件）</p>
 <p>再签名；</p>
-<h2 id="0x04-开始调试"><a href="#0x04-开始调试" class="headerlink" title="0x04 开始调试"></a>0x04 开始调试</h2><h3 id="1-导入工程（也就是导入生成的文件夹）"><a href="#1-导入工程（也就是导入生成的文件夹）" class="headerlink" title="1.导入工程（也就是导入生成的文件夹）"></a>1.导入工程（也就是导入生成的文件夹）</h3><p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/6.png" alt="img"></p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/7.png" alt="img"></p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/8.png" alt="img"></p>
+<h2 id="0x04-开始调试"><a href="#0x04-开始调试" class="headerlink" title="0x04 开始调试"></a>0x04 开始调试</h2><h3 id="1-导入工程（也就是导入生成的文件夹）"><a href="#1-导入工程（也就是导入生成的文件夹）" class="headerlink" title="1.导入工程（也就是导入生成的文件夹）"></a>1.导入工程（也就是导入生成的文件夹）</h3><p><img src="https://5am1i.github.io/2018/04/28/img1/6.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/7.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/8.png" alt="img"></p>
 <h3 id="2-设置断点"><a href="#2-设置断点" class="headerlink" title="2.设置断点"></a>2.设置断点</h3><p>这里就不多讲，先假设我们已经找到加密函数的位置；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/9.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/9.png" alt="img"></p>
 <h3 id="3-连接设备"><a href="#3-连接设备" class="headerlink" title="3.连接设备"></a>3.连接设备</h3><p>记得将设备设置成调试模式；至于怎么找到调试模式的按钮，就自己上网查了。</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/9.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/9.png" alt="img"></p>
 <p>连接上设备，安装应用；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/10.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/10.png" alt="img"></p>
 <h3 id="4-启动应用"><a href="#4-启动应用" class="headerlink" title="4.启动应用"></a>4.启动应用</h3><p>启动应用，因为在入口处设置了waitForDebuggable()函数，所以应用在启动的时候会进入调试模式，此时会弹出一个应用正在被调试的窗口，我这里没有弹出来，但是我们可以到DDMS里看；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/11.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/11.png" alt="img"></p>
 <p>这里可以看到应用有个红色的小虫子的标志，这里代表此应用可以被调试；</p>
 <h3 id="5-调试应用"><a href="#5-调试应用" class="headerlink" title="5.调试应用"></a>5.调试应用</h3><p>回到eclipse，找到小虫子的按钮，进入Debug Configuration；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/12.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/12.png" alt="img"></p>
 <p>双击进入Remote Java APPlication，project，记得要设置为当前对应调试的项目；</p>
 <p>connection有Listner和Attach方式；</p>
 <ul>
@@ -49,13 +49,13 @@
 <p>我们这种调试方式选择Attack；</p>
 <p>设置Host和port；</p>
 <p>Host一般为localhost，本地调试；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/13.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/13.png" alt="img"></p>
 <p>至于port怎么看，这里涉及到JDWP线程；我总结下，用通俗的话解释，可以看到，上面的图中有个8631的数字，那个便是应用所使用的端口，点一下，可以看到8631/8700，所以也可以设置为8700为调试端口，如果系统同时存在有两个或两个以上的程序可以调试，设置为8700的话，就不知道调的是哪个了，所以一般建议将调试端口和调试项目对应起来；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/14.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/14.png" alt="img"></p>
 <p>调试成功后，小虫子会变绿，不要问我为什么变绿；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/15.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/15.png" alt="img"></p>
 <p>此时应用也进入主界面，但是由于我调试的这个应用已经不能访问了，所以出现下面这种情况；</p>
-<p><img src="https://github.com/5am1i/5am1i.github.io/tree/master/2018/04/28/img1/16.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img1/16.png" alt="img"></p>
 <h2 id="0x05-总结"><a href="#0x05-总结" class="headerlink" title="0x05 总结"></a>0x05 总结</h2><p>文章到这里，留下两个问题：</p>
 <ol>
 <li>怎么找的加密函数（关键函数，需要下断点的函数）的位置；</li>
@@ -69,4 +69,4 @@
 <li>项目名称要对应调试的应用；</li>
 <li>端口要对应调试的应用；</li>
 </ul>
-</div><iframe src="/donate/?AliPayQR=undefined&amp;WeChatQR=/img/WeChatQR.png&amp;GitHub=null&amp;BTCQR=null&amp;BTCKEY=null&amp;PayPal=null" style="overflow-x:hidden; overflow-y:hidden; border:0xp none #fff; min-height:240px; width:100%;" frameborder="0" scrolling="no"></iframe><div class="tags"><a href="/tags/Android/">Android</a></div><div class="post-nav"><a class="pre" href="/2018/06/01/常用端口速查/">常用端口速查</a><a class="next" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></div></div></div></div><div class="pure-u-1 pure-u-md-1-4"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://5am1i.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/SRC/" style="font-size: 15px;">SRC</a> <a href="/tags/Web/" style="font-size: 15px;">Web</a> <a href="/tags/blog/" style="font-size: 15px;">blog</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/12/常见问题修复建议/">常见问题修复建议</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/信息搜集之搜索引擎/">信息搜集之搜索引擎</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/常用端口速查/">常用端口速查</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-Eclipse调试/">动态分析-Eclipse调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/AndroidManifest-xml的安全问题/">AndroidManifest.xml的安全问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/阿里Android开发手册-安全/">阿里Android开发手册-安全</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/SRC怎么玩/">SRC怎么玩</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/19/Android去广告/">Android去广告</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/13/Android平台WebView控件存在跨域访问高危漏洞/">Android平台WebView控件存在跨域访问高危漏洞</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://init1.in/" title="这个友联需要用谷歌浏览器打开" target="_blank">这个友联需要用谷歌浏览器打开</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Samli.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+</div><iframe src="/donate/?AliPayQR=undefined&amp;WeChatQR=/img/WeChatQR.png&amp;GitHub=null&amp;BTCQR=null&amp;BTCKEY=null&amp;PayPal=null" style="overflow-x:hidden; overflow-y:hidden; border:0xp none #fff; min-height:240px; width:100%;" frameborder="0" scrolling="no"></iframe><div class="tags"><a href="/tags/Android/">Android</a></div><div class="post-nav"><a class="pre" href="/2018/06/01/常用端口速查/">常用端口速查</a><a class="next" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></div></div></div></div><div class="pure-u-1 pure-u-md-1-4"><div id="sidebar"><div class="widget"><form class="search-form" action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" target="_blank"><input type="search" name="word" maxlength="20" placeholder="Search"/><input type="hidden" name="si" value="https://5am1i.github.io"/><input name="tn" type="hidden" value="bds"/><input name="cl" type="hidden" value="3"/><input name="ct" type="hidden" value="2097152"/><input name="s" type="hidden" value="on"/></form></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tags/Android/" style="font-size: 15px;">Android</a> <a href="/tags/SRC/" style="font-size: 15px;">SRC</a> <a href="/tags/blog/" style="font-size: 15px;">blog</a> <a href="/tags/Web/" style="font-size: 15px;">Web</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2018/10/12/常见问题修复建议/">常见问题修复建议</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/信息搜集之搜索引擎/">信息搜集之搜索引擎</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/06/01/常用端口速查/">常用端口速查</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-Eclipse调试/">动态分析-Eclipse调试</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/动态分析-AndroidStudio调试-IDA-我来了/">动态分析-AndroidStudio调试+IDA 我来了</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/AndroidManifest-xml的安全问题/">AndroidManifest.xml的安全问题</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/28/阿里Android开发手册-安全/">阿里Android开发手册-安全</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/20/SRC怎么玩/">SRC怎么玩</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/04/19/Android去广告/">Android去广告</a></li><li class="post-list-item"><a class="post-list-link" href="/2018/01/13/Android平台WebView控件存在跨域访问高危漏洞/">Android平台WebView控件存在跨域访问高危漏洞</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://init1.in/" title="这个友联需要用谷歌浏览器打开" target="_blank">这个友联需要用谷歌浏览器打开</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2019 <a href="/." rel="nofollow">Samli.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.2.5/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
