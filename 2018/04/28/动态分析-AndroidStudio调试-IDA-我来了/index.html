@@ -29,105 +29,105 @@
 <p>大部分加密函数，关键函数会放在so文件里，用ida分析so文件，可以帮助我们定位到关键函数，然后继续修改smali，从而达到我们破解的目的。</p>
 <p>但是今天不讲静态分析。</p>
 <h2 id="0x01-调试前准备"><a href="#0x01-调试前准备" class="headerlink" title="0x01 调试前准备"></a>0x01 调试前准备</h2><p>以阿里Crackme为例，学习ida native分析。</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\1.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/1.png" alt="img"></p>
 <h3 id="1-反编译"><a href="#1-反编译" class="headerlink" title="1.反编译"></a>1.反编译</h3><p>用AndroidKiller对目标apk进行反编译；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\1.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/1.png" alt="img"></p>
 <h3 id="2-添加debuggable属性"><a href="#2-添加debuggable属性" class="headerlink" title="2.添加debuggable属性"></a>2.添加debuggable属性</h3><p>反编译成功后，为了后面的动态调试，需要我们做两件事；</p>
-<h5 id="1-在AndroidManifest-xml中添加android-debuggable-”true”"><a href="#1-在AndroidManifest-xml中添加android-debuggable-”true”" class="headerlink" title="1.在AndroidManifest.xml中添加android:debuggable=”true”"></a>1.在AndroidManifest.xml中添加android:debuggable=”true”</h5><p><img src="E:\gitblog\hexo\public\2018\04\28\img\1.png" alt="img"></p>
-<h5 id="2-在入口处添加waitForDebugger代码进行等待调试"><a href="#2-在入口处添加waitForDebugger代码进行等待调试" class="headerlink" title="2.在入口处添加waitForDebugger代码进行等待调试"></a>2.在入口处添加waitForDebugger代码进行等待调试</h5><p><img src="E:\gitblog\hexo\public\2018\04\28\img\1.png" alt="img"></p>
+<h5 id="1-在AndroidManifest-xml中添加android-debuggable-”true”"><a href="#1-在AndroidManifest-xml中添加android-debuggable-”true”" class="headerlink" title="1.在AndroidManifest.xml中添加android:debuggable=”true”"></a>1.在AndroidManifest.xml中添加android:debuggable=”true”</h5><p><img src="https://5am1i.github.io/2018/04/28/img/1.png" alt="img"></p>
+<h5 id="2-在入口处添加waitForDebugger代码进行等待调试"><a href="#2-在入口处添加waitForDebugger代码进行等待调试" class="headerlink" title="2.在入口处添加waitForDebugger代码进行等待调试"></a>2.在入口处添加waitForDebugger代码进行等待调试</h5><p><img src="https://5am1i.github.io/2018/04/28/img/1.png" alt="img"></p>
 <p>找到入口，添加一行代码：<code>invoke-static {}, Landroid/os/Debug;-&gt;waitForDebugger()V</code></p>
 <p>其实对应的Java代码就是：<code>android.os.Debug.waitForDebugger();</code></p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\d469aa155cf040d2aa9bd2a466500b48/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/d469aa155cf040d2aa9bd2a466500b48/clipboard.png" alt="img"></p>
 <p>保存，再点击编译，编译成功；AndroidKiller会自动对apk进行签名，这也是其方便之处；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\b88ded85d46249cc96f225688713af44/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/b88ded85d46249cc96f225688713af44/clipboard.png" alt="img"></p>
 <p>再次反编译，可以看到java源码中增加了Debug.waitForDebugger();函数</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\9ecca06227a6492d91a25a0a07324d68/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/9ecca06227a6492d91a25a0a07324d68/clipboard.png" alt="img"></p>
 <h2 id="0x02-用Android-Studio对smali进行动态调试"><a href="#0x02-用Android-Studio对smali进行动态调试" class="headerlink" title="0x02 用Android Studio对smali进行动态调试"></a>0x02 用Android Studio对smali进行动态调试</h2><h3 id="1-插件安装"><a href="#1-插件安装" class="headerlink" title="1.插件安装"></a>1.插件安装</h3><p>android studio安装smalidea-0.03插件，点击File-&gt;Settings-&gt;plugins-&gt;instal plugins from disk，选择下载的zip包就行，不要解压。安装完成后，AS提示重启生效，重启即可</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\429c5841464744f793169e5dc26c3c6e/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/429c5841464744f793169e5dc26c3c6e/clipboard.png" alt="img"></p>
 <h3 id="2-导入工程"><a href="#2-导入工程" class="headerlink" title="2.导入工程"></a>2.导入工程</h3><p>点击File-&gt;Open，选择文件目录即可</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\4076a2bd9623488d9226274757769d91/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/4076a2bd9623488d9226274757769d91/clipboard.png" alt="img"></p>
 <h3 id="3-设置调试配置"><a href="#3-设置调试配置" class="headerlink" title="3.设置调试配置"></a>3.设置调试配置</h3><p>Run-&gt;Edit configurations，点击+号，新建remote类型调试器，设置Name， 修改端口号，用DDMS查看应用占用端口，一般都是8700；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\5d2deffe4665464591c964d83d6c8dc9/clipboard.png" alt="img"></p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\72e807fbec6d4055b6706e9d85be7ce5/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/5d2deffe4665464591c964d83d6c8dc9/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/72e807fbec6d4055b6706e9d85be7ce5/clipboard.png" alt="img"></p>
 <p>盗一张图</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\01bc6d8601b14151a3b44928ab4621c0/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/01bc6d8601b14151a3b44928ab4621c0/clipboard.png" alt="img"></p>
 <h3 id="4-开始调试"><a href="#4-开始调试" class="headerlink" title="4.开始调试"></a>4.开始调试</h3><p>因为我之前添加了waitForDebugger()，所以先下好断点，直接打开app，点击Debug（也就是绿色的那个小按钮），可以看到下图，<strong>（如果没有添加waitForDebugger()，可以用命令adbshell am start -D -n com.yaotong.crackme/.MainActivity来打开apk，从而进入调试模式）</strong>已经进入调试；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\9e952ab696ab4bc0bed2d60ebcadc8a0/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/9e952ab696ab4bc0bed2d60ebcadc8a0/clipboard.png" alt="img"></p>
 <p>此时，DDMS那边，红色小蜘蛛也变成绿色了，代表已经进入调试了。</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\a41e4898a98f405e9f781299d0f28b55/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/a41e4898a98f405e9f781299d0f28b55/clipboard.png" alt="img"></p>
 <p>开始调试，使用F7单步调试，F8单步跳出进行操作；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\5bc4c424b4324c1e8614693c2dc72ba2/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/5bc4c424b4324c1e8614693c2dc72ba2/clipboard.png" alt="img"></p>
 <p>至此，已经实现用Android Studio对smali进行动态调试，但是鉴于在实战中用Android Studio对smali进行动态调试的情况很少，原因是一般apk都不会像这些creakme这么小，当apk过大，一步步调试就显得过慢，所以出现用ida进行动态调试。</p>
 <h2 id="0x03-IDA调试Android-native"><a href="#0x03-IDA调试Android-native" class="headerlink" title="0x03 IDA调试Android native"></a>0x03 IDA调试Android native</h2><h3 id="1-IDA"><a href="#1-IDA" class="headerlink" title="1.IDA"></a>1.IDA</h3><h3 id="2-IDA快捷方式"><a href="#2-IDA快捷方式" class="headerlink" title="2.IDA快捷方式"></a>2.IDA快捷方式</h3><p><strong>F5/Tab</strong>        翻译成C语言</p>
 <p><strong>y</strong>            还原JNI函数名</p>
 <p>一般JNI函数方法名首先是一个指针加上一个数字，比如v3+676。然后将这个地址作为一个方法指针进行方法调用，并且第一个参数就是指针自己，比如(v3+676)(v3…)。这实际上就是我们在JNI里经常用到的JNIEnv方法。因为Ida并不会自动的对这些方法进行识别，所以当我们对so文件进行调试的时候经常会见到却搞不清楚这个函数究竟在干什么，因为这个函数实在是太抽象了。解决方法非常简单，只需要对JNIEnv指针做一个类型转换即可。</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\b91a1411076742eda60ae1d5a3d6193d/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/b91a1411076742eda60ae1d5a3d6193d/clipboard.png" alt="img"></p>
 <p>选中v3变量，按下y键；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\cde8611bd4274c2e94c91e6c6e9773b5/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/cde8611bd4274c2e94c91e6c6e9773b5/clipboard.png" alt="img"></p>
 <p>将声明类型转换成JNIEnv*；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\1295cbe0d8df409582c1e01c82a3c814/clipboard.png" alt="img"></p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\8405f705c6394e81ac058e37f7df15b8/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/1295cbe0d8df409582c1e01c82a3c814/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/8405f705c6394e81ac058e37f7df15b8/clipboard.png" alt="img"></p>
 <p><strong>Shift+F12</strong>            打开so中所有的字符串内容窗口</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\47c1f80f8f8845bc989f90e9635f5d55/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/47c1f80f8f8845bc989f90e9635f5d55/clipboard.png" alt="img"></p>
 <p><strong>Ctrl+S</strong>            在IDA View窗口时，是查看segment信息</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\0f7aa4a65a71410e9b81895a96b85ad6/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/0f7aa4a65a71410e9b81895a96b85ad6/clipboard.png" alt="img"></p>
 <p><strong>Ctrl+S</strong>            在调试窗口，也就是Debug View时，可以快速定位到我们想要调试的so文件映射到内存的地址</p>
 <p><strong>G</strong>                在IDA调试页面的时候，我们可以使用G键快速跳转到指定的内存位置</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\0d36948f58244d2c88687f1083029029/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/0d36948f58244d2c88687f1083029029/clipboard.png" alt="img"></p>
 <p>这里如果跳转到目的地址之后，发现是DCB数据的话，可以在使用 P 键，进行转化即可</p>
 <p><strong>F7</strong>        可以单步进入调试</p>
 <p><strong>F8</strong>        可以单步调试</p>
 <h3 id="3-调试前准备"><a href="#3-调试前准备" class="headerlink" title="3.调试前准备"></a>3.调试前准备</h3><h5 id="a-在IDA中找到android-server"><a href="#a-在IDA中找到android-server" class="headerlink" title="a.在IDA中找到android_server"></a>a.在IDA中找到android_server</h5><p>在IDA安装目录\dbgsrv\android_server</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\b080f9511e8b453395f03bd140e83d00/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/b080f9511e8b453395f03bd140e83d00/clipboard.png" alt="img"></p>
 <h5 id="b-将android-server放到设备-data-local-tmp，并执行"><a href="#b-将android-server放到设备-data-local-tmp，并执行" class="headerlink" title="b.将android_server放到设备/data/local/tmp，并执行"></a>b.将android_server放到设备/data/local/tmp，并执行</h5><p>用命令adb push</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\9e77a78300e345fc9ed629f2bfb86297/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/9e77a78300e345fc9ed629f2bfb86297/clipboard.png" alt="img"></p>
 <p><strong>tip: 需</strong>要真机，模拟器不能运行，原因是结构不同，一个是arm，一个是x86</p>
 <p>此时权限不足，不能执行，需要添加权限；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\af50ff1cdd6e4a38a8a736b28bc3d364/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/af50ff1cdd6e4a38a8a736b28bc3d364/clipboard.png" alt="img"></p>
 <p>添加权限；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\5128e620e58743c99380a459650f7148/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/5128e620e58743c99380a459650f7148/clipboard.png" alt="img"></p>
 <p>添加权限后；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\814ec680ba804c58baca376048854893/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/814ec680ba804c58baca376048854893/clipboard.png" alt="img"></p>
 <p>执行./android_server；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\81101081e76c4f5d9afacdb0dd893bb4/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/81101081e76c4f5d9afacdb0dd893bb4/clipboard.png" alt="img"></p>
 <p>此时ida仍然连接不上，因为还需要进行端口转发，</p>
 <p>adb forward tcp:23946 tcp:23946</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\e9c0caa545af4bd4a2d3e3321ad5816a/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/e9c0caa545af4bd4a2d3e3321ad5816a/clipboard.png" alt="img"></p>
 <h5 id="c-设置ida连接上设备"><a href="#c-设置ida连接上设备" class="headerlink" title="c.设置ida连接上设备"></a>c.设置ida连接上设备</h5><p>选择Debugger–&gt;Attach–&gt;Remote ARMLinux/Android debugger；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\48ed08c23b9f479fb6fadd715600ed29/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/48ed08c23b9f479fb6fadd715600ed29/clipboard.png" alt="img"></p>
 <p>设置Hostname为127.0.0.1或者localhost，也就是本地；Port默认23946，不需要改；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\88cd4d51971844438f888295770b9aa2/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/88cd4d51971844438f888295770b9aa2/clipboard.png" alt="img"></p>
 <p>在Debug option勾选这三项，方便调试；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\79196bdd39db4b83bd047eb84f64a5fa/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/79196bdd39db4b83bd047eb84f64a5fa/clipboard.png" alt="img"></p>
 <p>点击上面的ok后，会出现下图的进程列表，如果android_server没有以root权限运行，是看不到这么多进程的，所以要以root权限运行，然后找到需要调试的进程，可以试用Search功能进行搜索进程。</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\33b1c708b35747888847f02ac020e595/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/33b1c708b35747888847f02ac020e595/clipboard.png" alt="img"></p>
 <h3 id="4-正式调试"><a href="#4-正式调试" class="headerlink" title="4.正式调试"></a>4.正式调试</h3><p>以2016阿里的Crackme为例进行调试。</p>
 <p>目的：获取密码，或者绕过输入密码的界面；</p>
 <p>思路：找到输入密码按钮的关键函数，看是否能找到密码；先静态分析，查看源码，若是调用了so，需要到native层进行静态分析，然后动态调试，对关键函数进行下断点，理清函数执行流程，寻找突破。</p>
 <h4 id="0x00-寻找入口"><a href="#0x00-寻找入口" class="headerlink" title="0x00 寻找入口"></a>0x00 寻找入口</h4><p>这里我使用AndroidKiller打开apk，找到入口为   com.yaotong.crackme.MainActivity</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\8be87b5bf8d94a218d0a8036fbfc1e9b/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/8be87b5bf8d94a218d0a8036fbfc1e9b/clipboard.png" alt="img"></p>
 <p>查看并分析源码；发现securityCheck()放在native层调用，这时候我们需要到native层分析。</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\fb0e42c00f504625b34ecf80448be4e9/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/fb0e42c00f504625b34ecf80448be4e9/clipboard.png" alt="img"></p>
 <h4 id="0x01-寻找native函数的相对地址"><a href="#0x01-寻找native函数的相对地址" class="headerlink" title="0x01 寻找native函数的相对地址"></a>0x01 寻找native函数的相对地址</h4><p>将libcrackme.so拖到ida中分析，找到securityCheck()函数的位置；一般是完整的包名加函数名，如:Java_com_yaotong_crackme_MainActivity_securityCheck</p>
 <p>发现native函数的相对地址：11A8</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\613aedf910c94d2eaee5f6bad33445fa/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/613aedf910c94d2eaee5f6bad33445fa/clipboard.png" alt="img"></p>
 <h4 id="0x02-定位关键函数的绝对地址"><a href="#0x02-定位关键函数的绝对地址" class="headerlink" title="0x02 定位关键函数的绝对地址"></a>0x02 定位关键函数的绝对地址</h4><p>此时另外打开一个ida，按之前的方式，关联调试应用，选择对应的调试进程；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\05584ba38c87474299198053b5bc22ae/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/05584ba38c87474299198053b5bc22ae/clipboard.png" alt="img"></p>
 <p>用ctrl+s找到对应so，也就是libcrackme.so的基地址为：5BA11000</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\f3371b733e85481287afb5aa1fe513d5/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/f3371b733e85481287afb5aa1fe513d5/clipboard.png" alt="img"></p>
 <p>而绝对地址=基地址+相对地址=5BA11000+11A8=5BA121A8；使用G键，直接跳转到这个地址；</p>
 <p>选择第一个小蓝点，下个断点，然后F9运行程序；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\c42dfb6dfcbf4a8cb9d80c44a90bc913/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/c42dfb6dfcbf4a8cb9d80c44a90bc913/clipboard.png" alt="img"></p>
 <p>然后就挂掉了；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\a2e43c5f3f124da99227559f1c3c2dcb/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/a2e43c5f3f124da99227559f1c3c2dcb/clipboard.png" alt="img"></p>
 <p>这种情况一般就是做了反调试。</p>
 <h4 id="0x03-反调试技术"><a href="#0x03-反调试技术" class="headerlink" title="0x03 反调试技术"></a>0x03 反调试技术</h4><p>先简单说下调试原理，IDA是将android_server在root环境下注入到被调试的进程中，用到的技术是Linux的ptrace，而Android的进程如果被另一个进程ptrace之后，会在相应进程的    status文件中（文件目录/proc/[pid]/status）的一个字段（TracerPid）中标注是被哪个进程ptrace。这里就是反调试的关键。</p>
 <p>没有被调试的正常情况，如下：</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\f82d95b2bf31496c90eb13b549716de6/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/f82d95b2bf31496c90eb13b549716de6/clipboard.png" alt="img"></p>
 <p>应用被29443进程号的应用ptrace；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\717b5df6042c4ed994eae74506232266/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/717b5df6042c4ed994eae74506232266/clipboard.png" alt="img"></p>
 <p>查看29443的pid是谁；</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\e3e2c53672364302b8d7a6615e1bebf4/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/e3e2c53672364302b8d7a6615e1bebf4/clipboard.png" alt="img"></p>
 <p>也就是我们之前启动的ida带的android_server了。</p>
 <p>常见的反调试技术：</p>
 <ol>
@@ -138,7 +138,7 @@
 </ol>
 <p>等</p>
 <h4 id="0x04-添加debuggable属性，重打包"><a href="#0x04-添加debuggable属性，重打包" class="headerlink" title="0x04 添加debuggable属性，重打包"></a>0x04 添加debuggable属性，重打包</h4><p>因为AndroidKiller集成大部分功能，所以还是用AndroidKiller来完成这部分。</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\5fa3f08c83e44b6e9c81afce0f2eb95d/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/5fa3f08c83e44b6e9c81afce0f2eb95d/clipboard.png" alt="img"></p>
 <p>发现不行。。。</p>
 <p>好吧，原因是我debuggable放错地方了。。。     T.T</p>
 <p>好了，再来一次；</p>
@@ -151,7 +151,7 @@
 <p>那么正常方式进不去，有什么办法是能够在.init_array加载之前就能够进入debug？这是就想到waitForDebugger()函数了，只要把waitForDebugger()放在.init_array加载之前就可以了，但是这里不想又重打包，可以换个方式，用am命令，以调试的方式启动应用。</p>
 <p><code>adb shell am start -D -n com.yaotong.crackme/.MainActivity</code></p>
 <p><strong>-D</strong>,用debug方式启动</p>
-<p><img src="E:\gitblog\hexo\public\2018\04\28\img\72733ac40fd148cfbe63817381dcca3b/clipboard.png" alt="img"></p>
+<p><img src="https://5am1i.github.io/2018/04/28/img/72733ac40fd148cfbe63817381dcca3b/clipboard.png" alt="img"></p>
 <p>步骤按理应该是如下：</p>
 <p>第一步：运行：adb shell am start -D -n com.yaotong.crackme/.MainActivity</p>
 <p>出现Debugger的等待状态</p>
